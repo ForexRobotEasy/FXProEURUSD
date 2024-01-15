@@ -1,0 +1,52 @@
+
+// Forex Robot Easy Team
+// forexroboteasy.com
+
+// Define the input parameters for the Expert Advisor
+input double RiskLevel = 0.01; // Default risk level
+input int MaxDrawdownCautious = 5; // Maximum drawdown for cautious strategy
+input int MaxDrawdownAdventurous = 70; // Maximum drawdown for adventurous strategy
+
+// Define the main function for the Expert Advisor
+void OnTick()
+{
+   // Get the current prices of EURUSD
+   double currentHigh = High[0];
+   double currentLow = Low[0];
+   
+   // Calculate the average price of EURUSD for the last 10 bars
+   double averagePrice = 0;
+   for (int i = 0; i < 10; i++)
+   {
+      averagePrice += Close[i];
+   }
+   averagePrice /= 10;
+   
+   // Check if the current price is higher than the average price
+   if (currentHigh > averagePrice)
+   {
+      // Calculate the risk for the current trade
+      double currentRisk = AccountBalance() * RiskLevel;
+      
+      // Check if the current risk is within the maximum drawdown for the cautious strategy
+      if (currentRisk <= AccountBalance() * MaxDrawdownCautious / 100)
+      {
+         // Execute a buy trade with the current risk
+         OrderSend(Symbol(), OP_BUY, currentRisk, Ask, 0, 0, 0, 'Buy order', 0, 0, Green);
+      }
+   }
+   else if (currentLow < averagePrice)
+   {
+      // Calculate the risk for the current trade
+      double currentRisk = AccountBalance() * RiskLevel;
+      
+      // Check if the current risk is within the maximum drawdown for the adventurous strategy
+      if (currentRisk <= AccountBalance() * MaxDrawdownAdventurous / 100)
+      {
+         // Execute a sell trade with the current risk
+         OrderSend(Symbol(), OP_SELL, currentRisk, Bid, 0, 0, 0, 'Sell order', 0, 0, Red);
+      }
+   }
+}
+
+// Other necessary trading functions can be implemented here
